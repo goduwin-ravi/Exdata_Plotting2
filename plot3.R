@@ -1,35 +1,47 @@
+##
 ## Install required packages
-#install.packages("ggplot2")  #Uncomment this line only if necessary
+#install.packages("sqldf")    # Run only if necessary
+#install.packages("ggplot2")  # Run only if necessary
 
-## Load the required libraries
-library(sqldf)
-library(ggplot2) 
+## Load required libraries
+require(sqldf); library(sqldf)
+require(ggplot2); library(ggplot2)
 
+## Initialize variables
 file1  <- "summarySCC_PM25.rds"
 file2  <- "Source_Classification_Code.rds"
 keyCol <- "SCC"
 
-## Read file1. This could take a few seconds. Be Patient!
+
+## **********************************************************************
+## Question-3:
+## Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, 
+## which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? 
+## Which have seen increases in emissions from 1999–2008? 
+## Use the ggplot2 plotting system to make a plot answer this question.
+
+
+## **********************************************************************
+## Reading input file. This could take a few seconds. Be Patient!
 DF <- data.frame(readRDS(file1))
 
-## Select data for the graph
+
+## **********************************************************************
+## Select and organize data for the graph. This could take a few more seconds. Be Patient!
 DF1 <- sqldf("select year as year, type as type, sum(Emissions) as emissions from DF 
                   where fips=24510
                   group by year, type order by year, type")
+DF1
 
-## Plot graph using PNG device
-x <- DF1$year
-y <- DF1$emissions/1000
-type <- 1:4
 
+## **********************************************************************
+## Plotting graph using PNG device
 png(filename="./plot3.png")
 
-qplot(x, y, data=DF1, shape=am, color=am, 
-         facets=type, size=I(3),
-         main="Emissions by Type for Baltimore", col.main="black", 
-         xlab="Year (1999-2008)", ylab="Total Emissions PM25 (in thousand particles)", col.lab="blue") 
-#lines(x, y, col="red")
+ggplot(DF1, aes(y = year, x = emissions)) + geom_boxplot(binwidth = 1) + facet_grid(type ~ .)
 
+
+## **********************************************************************
 ## Close graphics device
 dev.off()
 

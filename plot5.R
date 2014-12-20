@@ -14,32 +14,39 @@ keyCol <- "SCC"
 
 
 ## **********************************************************************
-## Question-2:
-## Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") 
-## from 1999 to 2008? Use the base plotting system to make a plot answering this question.
+## Question-5:
+## How have emissions from motor vehicle sources changed from 1999?2008 in Baltimore City (fips=24510)?
 
 
 ## **********************************************************************
-## Reading input file. This could take a few seconds. Be Patient!
-DF <- data.frame(readRDS(file1))
+## Read input file. This could take a few seconds. Be Patient!
+DF <- data.frame(merge(readRDS(file1),readRDS(file2),by=c(keyCol)))
+names(DF) <- gsub(".", "", names(DF), fixed=TRUE)
+names(DF)
 
 
 ## **********************************************************************
 ## Select and organize data for the graph. This could take a few more seconds. Be Patient!
-DF1 <- sqldf("select year as year, sum(Emissions) as emissions from DF 
-                  where fips=24510
-                  group by year order by year")
+rowsNeeded <- as.vector(grep("motor|Motor", DF$ShortName))  ## All rows that contain the Key Word 
+colsNeeded <- c("year", "fips", "Emissions")                ## Columns absolutely needed to generate plot
+
+DF1 <- DF[rowsNeeded, colsNeeded]
+DF2 <- sqldf("select year as year, sum(Emissions) as emissions from DF1 
+             where fips=24510 group by year order by year")
+DF2
 
 
 ## **********************************************************************
 ## Plot graph using PNG device
-x <- DF1$year
-y <- DF1$emissions/1000
+png(filename="./plot5.png")
 
-png(filename="./plot2.png")
-plot(x, y, type="n", main="Total PM25 Emissions from all sources for Baltimore", col.main="black", 
-                     xlab="Year (1999-2008)", ylab="Total PM25 Emissions (in thousand particles)", col.lab="blue") 
+x <- DF2$year
+y <- DF2$emissions
+
+plot(x, y, type="n", main="Motor Vehicle-Related PM25 Emissions for Baltimore", col.main="black", 
+     xlab="Year (1999-2008)", ylab="PM25 Emissions", col.lab="blue") 
 lines(x, y, col="red")
+
 
 ## **********************************************************************
 ## Close graphics device
@@ -47,5 +54,4 @@ dev.off()
 
 ## Close SQL connections
 sqldf()
-
 
