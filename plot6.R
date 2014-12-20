@@ -48,7 +48,7 @@ DF2
 ## Plot graph using PNG device
 png(filename="./plot6.png")
 
-ggplot(DF2, aes(y = year, x = emissions)) + geom_boxplot(binwidth = 1) + facet_grid(city ~ .)
+ggplot(DF2, aes(x = year, y = emissions)) + geom_line() + geom_point() + facet_grid(city ~ .)
 
 
 ## **********************************************************************

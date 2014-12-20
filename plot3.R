@@ -38,7 +38,7 @@ DF1
 ## Plotting graph using PNG device
 png(filename="./plot3.png")
 
-ggplot(DF1, aes(y = year, x = emissions)) + geom_boxplot(binwidth = 1) + facet_grid(type ~ .)
+ggplot(DF1, aes(x = year, y = emissions)) + geom_line() + geom_point() + facet_grid(type ~ .)
 
 
 ## **********************************************************************
